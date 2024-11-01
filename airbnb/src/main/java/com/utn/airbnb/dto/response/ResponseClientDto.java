@@ -1,21 +1,20 @@
-package com.utn.airbnb.entities;
+package com.utn.airbnb.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import jakarta.persistence.*;
+import com.utn.airbnb.dto.ClientCredentialsDto;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Entity
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class Client {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class ResponseClientDto {
     private Long id;
     private String name;
     private String gender;
     private Integer edad;
-    @OneToOne
-    @JoinColumn(name = "credential_id")
-    private ClientCredentials credentials;
+    private ClientCredentialsDto credentials;
 }

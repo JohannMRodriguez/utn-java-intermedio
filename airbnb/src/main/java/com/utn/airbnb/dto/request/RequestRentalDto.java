@@ -1,21 +1,19 @@
-package com.utn.airbnb.entities;
+package com.utn.airbnb.dto.request;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import jakarta.persistence.*;
+import com.utn.airbnb.dto.RentalCategoryDto;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Entity
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class Rental {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class RequestRentalDto {
     private String description;
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private RentalCategory category;
+    private RentalCategoryDto category;
     private Boolean onRent;
     private Float pricePerDay;
 }

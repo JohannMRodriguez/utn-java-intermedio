@@ -2,20 +2,19 @@ package com.utn.airbnb.entities;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Data;
 
 @Entity
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class Rental {
+public class ClientCredentials {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String description;
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private RentalCategory category;
-    private Boolean onRent;
-    private Float pricePerDay;
+    private String username;
+    private String password;
 }
