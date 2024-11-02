@@ -8,6 +8,7 @@ import com.utn.airbnb.dto.response.ResponseBookingDto;
 import com.utn.airbnb.entities.Booking;
 import com.utn.airbnb.repositories.BookingRepository;
 import com.utn.airbnb.services.IBookingService;
+import com.utn.airbnb.services.adapter.BookingAdapter;
 import com.utn.airbnb.services.implementation.ClientService;
 import com.utn.airbnb.services.implementation.RentalService;
 import com.utn.airbnb.utils.Mensajes;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class BookingService implements IBookingService {
@@ -45,22 +47,13 @@ public class BookingService implements IBookingService {
 
     public List<ResponseBookingDetailsDto> getAllBookings() {
 
+        BookingAdapter adapter = new BookingAdapter(rentalService, clientService);
+
         var bookings = bookingRepository.findAll();
-        var response = new ArrayList<ResponseBookingDetailsDto>();
 
-        bookings.forEach(each -> {
-                    var rentalDetails = rentalService.obtenerAlquilerPorId(each.getIdRental());
-                    var clientDetails = clientService.obtenerClientePorId(each.getIdClient());
-
-                    var booking = new ResponseBookingDetailsDto();
-                    booking.setClientName(clientDetails.getName());
-                    booking.setRentalCategory(rentalDetails.getCategory());
-                    booking.setRentalDescription(rentalDetails.getDescription());
-
-                    response.add(booking);
-                });
-
-        return response;
+        return bookings.stream()
+                .map(adapter::adapt)
+                .collect(Collectors.toList());
     }
 
     public void deleteBooking(RequestBookingDto request) {
