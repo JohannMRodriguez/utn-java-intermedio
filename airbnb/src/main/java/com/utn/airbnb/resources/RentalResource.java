@@ -1,8 +1,10 @@
 package com.utn.airbnb.resources;
 
+import com.utn.airbnb.application.swagger.SwaggerApiConfig;
 import com.utn.airbnb.dto.request.RequestRentalDto;
 import com.utn.airbnb.dto.response.ResponseRentalDto;
 import com.utn.airbnb.services.implementation.RentalService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import static com.utn.airbnb.utils.Constantes.RENTAL_BASE_PATH;
 
 @RestController
 @RequestMapping(RENTAL_BASE_PATH)
+@Tag(name = SwaggerApiConfig.API_RENTAL_TAG)
 public class RentalResource {
     @Autowired
     private RentalService service;
