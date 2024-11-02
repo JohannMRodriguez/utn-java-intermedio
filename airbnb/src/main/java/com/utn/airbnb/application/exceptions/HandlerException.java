@@ -13,7 +13,7 @@ public class HandlerException {
     public ResponseEntity<ErrorResponseDto> badRequestExceptionHandler(Exception e) {
         var errorResponse = new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value());
         return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
+                .status(HttpStatus.BAD_REQUEST)
                 .body(errorResponse);
     }
 
@@ -22,6 +22,14 @@ public class HandlerException {
         var errorResponse = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
+                .body(errorResponse);
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ErrorResponseDto> unauthorizedExceptionHandler(Exception e) {
+        var errorResponse = new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value());
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
                 .body(errorResponse);
     }
 }

@@ -25,12 +25,12 @@ public class SwaggerApiConfig {
                         .title(API_MAIN_TAG)
                         .description(API_DESCRIPTION)
                         .version("1.0"))
-//                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
-//                .components(new io.swagger.v3.oas.models.Components()
-//                        .addSecuritySchemes("bearerAuth",
-//                                new SecurityScheme().type(SecurityScheme.Type.HTTP)
-//                                        .scheme("bearer")
-//                                        .bearerFormat("JWT")))
+                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
+                .components(new io.swagger.v3.oas.models.Components()
+                        .addSecuritySchemes("bearerAuth",
+                                new SecurityScheme().type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")))
                                         ;
     }
 
