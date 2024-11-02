@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class RequestBookingByDescriptionDto {
-    private String username;
+public class RequestBookingDto {
+    private Long idClient;
+    private Long idRental;
 }

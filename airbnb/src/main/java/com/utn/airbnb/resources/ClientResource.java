@@ -28,7 +28,7 @@ public class ClientResource {
     }
 
     @PostMapping
-    public ResponseEntity<ResponseClientDto> createNewRental(@RequestBody RequestClientDto request) {
+    public ResponseEntity<ResponseClientDto> createNewClient(@RequestBody RequestClientDto request) {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

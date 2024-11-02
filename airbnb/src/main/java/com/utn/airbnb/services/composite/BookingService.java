@@ -1,52 +1,77 @@
 package com.utn.airbnb.services.composite;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utn.airbnb.application.exceptions.BadRequestException;
-import com.utn.airbnb.dto.request.RequestBookingByDescriptionDto;
+import com.utn.airbnb.dto.request.RequestBookingDto;
+import com.utn.airbnb.dto.response.ResponseBookingDetailsDto;
 import com.utn.airbnb.dto.response.ResponseBookingDto;
-import com.utn.airbnb.dto.response.ResponseRentalDto;
+import com.utn.airbnb.entities.Booking;
+import com.utn.airbnb.repositories.BookingRepository;
+import com.utn.airbnb.services.IBookingService;
 import com.utn.airbnb.services.implementation.ClientService;
 import com.utn.airbnb.services.implementation.RentalService;
 import com.utn.airbnb.utils.Mensajes;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Service
-public class BookingService {
+public class BookingService implements IBookingService {
 
     @Autowired
     private RentalService rentalService;
     @Autowired
     private ClientService clientService;
+    @Autowired
+    private BookingRepository bookingRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    public ResponseBookingDto bookRentalByDescription(String description, RequestBookingByDescriptionDto request) {
+    public ResponseBookingDto createBooking(RequestBookingDto request) {
 
-        if (Optional.ofNullable(description).isEmpty()) {
-            throw new BadRequestException(Mensajes.CAMPO_DESCRIPTION_ERROR);
+        if (rentalService.obtenerAlquilerPorId(request.getIdRental()).getOnRent()) {
+            throw new BadRequestException(Mensajes.ALQUILER_INDISPONIBLE);
         }
 
-        var clientId = clientService.obtenerClientePorUsername(request.getUsername()).getId();
+        clientService.obtenerClientePorId(request.getIdClient());
 
-        var rentals = rentalService.obtenerTodosAlquileres();
-        var rental = rentals.stream()
-                .filter(each -> StringUtils.equalsIgnoreCase(each.getDescription(), description))
-                .findFirst()
-                .orElse(new ResponseRentalDto());
+        var booking = bookingRepository.save(objectMapper.convertValue(request, Booking.class));
+        rentalService.cambiarEstado(request.getIdRental());
+        return objectMapper.convertValue(booking, ResponseBookingDto.class);
+    }
 
-        if (Optional.ofNullable(rental.getDescription()).isEmpty()) { throw new BadRequestException(Mensajes.ALQUILER_NOT_FOUND); }
+    public List<ResponseBookingDetailsDto> getAllBookings() {
 
-        if (Boolean.TRUE.equals(rental.getOnRent())) { throw new BadRequestException(Mensajes.ALQUILER_INDISPONIBLE); }
+        var bookings = bookingRepository.findAll();
+        var response = new ArrayList<ResponseBookingDetailsDto>();
 
-        var toogleStatusRental = rentalService.cambiarEstado(rental.getId());
+        bookings.forEach(each -> {
+                    var rentalDetails = rentalService.obtenerAlquilerPorId(each.getIdRental());
+                    var clientDetails = clientService.obtenerClientePorId(each.getIdClient());
 
-        var response = new ResponseBookingDto();
-        response.setRentalId(toogleStatusRental.getId());
-        response.setClientId(clientId);
+                    var booking = new ResponseBookingDetailsDto();
+                    booking.setClientName(clientDetails.getName());
+                    booking.setRentalCategory(rentalDetails.getCategory());
+                    booking.setRentalDescription(rentalDetails.getDescription());
+
+                    response.add(booking);
+                });
+
         return response;
     }
 
-    public List<>
+    public void deleteBooking(RequestBookingDto request) {
+
+        var booking = bookingRepository.findByIdRental(request.getIdRental());
+
+        if (!Objects.equals(booking.getIdClient(), request.getIdClient())) {
+            throw new BadRequestException(Mensajes.INCOMPATIBLE_CLIENT_RENTAL);
+        }
+
+        bookingRepository.deleteById(booking.getId());
+        rentalService.cambiarEstado(request.getIdRental());
+    }
 }

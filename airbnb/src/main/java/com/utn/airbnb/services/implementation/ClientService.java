@@ -57,28 +57,28 @@ public class ClientService implements IClientService {
     @Override
     public ClientCredentialsDto obtenerClienteCredentialsPorUsername(String username) {
 
-        var cliente = credentialsRepository.findByUsername(username);
+        var client = credentialsRepository.findByUsername(username);
 
-        if (cliente.isEmpty()) { return new ClientCredentialsDto(); }
+        if (client.isEmpty()) { return new ClientCredentialsDto(); }
 
-        return objectMapper.convertValue(cliente.get(), ClientCredentialsDto.class);
+        return objectMapper.convertValue(client.get(), ClientCredentialsDto.class);
     }
 
     @Override
-    public ResponseClientDto crearCliente(RequestClientDto cliente) {
+    public ResponseClientDto crearCliente(RequestClientDto client) {
 
 //        TODO validar q el username ya no este creado
-        var user = Optional.ofNullable(obtenerClienteCredentialsPorUsername(cliente.getCredentials().getUsername()).getUsername());
+        var user = Optional.ofNullable(obtenerClienteCredentialsPorUsername(client.getCredentials().getUsername()).getUsername());
         if (user.isPresent()) { throw new BadRequestException(Mensajes.CLIENT_EXISTENTE); }
 
 //        TODO encriptar la contrasena
-        var credentials = objectMapper.convertValue(cliente.getCredentials(), ClientCredentials.class);
+        var credentials = objectMapper.convertValue(client.getCredentials(), ClientCredentials.class);
         var clientCredentials = credentialsRepository.save(credentials);
 
-        var clientRequest = objectMapper.convertValue(cliente, Client.class);
+        var clientRequest = objectMapper.convertValue(client, Client.class);
         clientRequest.setCredentials(clientCredentials);
-        var client = repository.save(clientRequest);
+        var clientSaved = repository.save(clientRequest);
 
-        return objectMapper.convertValue(client, ResponseClientDto.class);
+        return objectMapper.convertValue(clientSaved, ResponseClientDto.class);
     }
 }
