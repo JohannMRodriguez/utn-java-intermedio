@@ -6,6 +6,7 @@ import com.utn.airbnb.dto.response.ResponseClientDto;
 
 public interface IClientService {
     ResponseClientDto obtenerClientePorId(Long id);
-    ClientCredentialsDto obtenerClientePorUsername(String username);
+    ResponseClientDto obtenerClientePorUsername(String username);
+    ClientCredentialsDto obtenerClienteCredentialsPorUsername(String username);
     ResponseClientDto crearCliente(RequestClientDto cliente);
 }

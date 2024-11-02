@@ -12,6 +12,7 @@ import com.utn.airbnb.repositories.ClientCredentialsRepository;
 import com.utn.airbnb.repositories.ClientRepository;
 import com.utn.airbnb.services.IClientService;
 import com.utn.airbnb.utils.Mensajes;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +39,23 @@ public class ClientService implements IClientService {
     }
 
     @Override
-    public ClientCredentialsDto obtenerClientePorUsername(String username) {
+    public ResponseClientDto obtenerClientePorUsername(String username) {
+
+        var clients = repository.findAll();
+
+        var client = clients.stream()
+                .filter(each -> StringUtils.equals(each.getCredentials().getUsername(), username))
+                .findFirst()
+                .orElse(new Client());
+        System.out.println(clients);
+
+        if (Optional.ofNullable(client.getId()).isEmpty()) { throw new NotFoundException(Mensajes.CLIENT_NOT_FOUND); }
+
+        return objectMapper.convertValue(client, ResponseClientDto.class);
+    }
+
+    @Override
+    public ClientCredentialsDto obtenerClienteCredentialsPorUsername(String username) {
 
         var cliente = credentialsRepository.findByUsername(username);
 
@@ -51,7 +68,7 @@ public class ClientService implements IClientService {
     public ResponseClientDto crearCliente(RequestClientDto cliente) {
 
 //        TODO validar q el username ya no este creado
-        var user = Optional.ofNullable(obtenerClientePorUsername(cliente.getCredentials().getUsername()).getUsername());
+        var user = Optional.ofNullable(obtenerClienteCredentialsPorUsername(cliente.getCredentials().getUsername()).getUsername());
         if (user.isPresent()) { throw new BadRequestException(Mensajes.CLIENT_EXISTENTE); }
 
 //        TODO encriptar la contrasena
